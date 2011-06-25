@@ -1,6 +1,12 @@
 <div class="Logs">
-	<% control showLogs %><div class="Log">
-		<h2>$File ($Link)</h2>
-		$LogData
-	</div><% end_control %>
+    <% if Log %>
+        <% control Log %>
+            <div class="Log">
+                    <h2>$Log.File ($Path)</h2>
+                    $Data.Value
+            </div>
+        <% end_control %>
+    <% else %>
+        <p>No logs available</p>
+    <% end_if %>
 </div>

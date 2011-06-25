@@ -6,84 +6,119 @@
  * @package LogViewer
  */
 class LogAdmin extends LeftAndMain {
-	static $url_segment = 'logs';
-	static $url_rule = '/$Action/$ID/$OtherID';
-	static $menu_title = 'Logs';
-	static $menu_priority = -1;
-	static $url_priority = 99;
+    public static $url_segment = 'logs';
+    public static $url_rule = '/$Action/$ID/$OtherID';
+    public static $menu_title = 'Logs';
+    public static $menu_priority = -1;
+    public static $url_priority = 99;
 
-	static $logs = array();
+    private static $logs = array();
 
     public function init() {
-		parent::init();
+        parent::init();
 
-		Requirements::css('logviewer/css/LogAdmin.css');
-		Requirements::javascript('logviewer/javascript/LogAdmin.js');
-	}
+        Requirements::css('logviewer/css/LogAdmin.css');
+        Requirements::javascript('logviewer/javascript/LogAdmin.js');
+    }
 
-	public function addLog($logFile = null,$linkType = 'r') {
-		if($logFile)
-			array_push(self::$logs, "$logFile::$linkType");
-	}
-	
-	public function logNav() {
-		$output = new DataObjectSet();
-		
-		if(count(self::$logs) > 0) {
-			foreach(self::$logs as $log) {
-				$log = $this->get_log_data($log);
+    /**
+     * Use addLog to add log files that will be rendered in the CMS. You can add
+     * new logs by calling LogAdmin::addLog($logFile,$linkType) in your _config.
+     * 
+     * @param type $logLoc File path to log
+     * @param type $linkType Say if the path is relative 'r' or absolute 'a'
+     */
+    public function addLog($logLoc = null,$linkType = 'r') {
+        if($logLoc)
+            array_push(
+                self::$logs,
+                array(
+                    'Location'  => self::get_log_path($logLoc,$linkType),
+                    'Filename'  => basename($logLoc),
+                    'Type'      => $linkType
+                )
+            );
+    }
 
-				$output->push(new ArrayData(array(
-					'File'		=> $log['File'],
-					'Link'		=> $log['Link']
-				)));
-			}
+    /**
+     * Return a list of all logs that will be used for navigation
+     * 
+     * @return DataObjectSet 
+     */    
+    public function getLogList() {
+        $output = new DataObjectSet();
 
-			return $output;
-		}
-	}
+        if(count(self::$logs) > 0) {
+            foreach(self::$logs as $log) {
+                $output->push(new ArrayData(array(
+                    'File'  => $log['Filename'],
+                    'Slug'  => str_replace('.', '-', $log['Filename'])
+                )));
+            }
 
-	public function showLogs() {
-		$output = new DataObjectSet();
+            return $output;
+        }
+    }
 
-		if(count(self::$logs) > 0) {
-			foreach(self::$logs as $log) {
-				$log = $this->get_log_data($log);
+    /**
+     * Get detail of a specific log, open and process it, then return
+     * to template
+     * 
+     * @return ArrayData
+     */
+    public function getLog() {
+        if(is_array(self::$logs) && count(self::$logs) > 0) {
+            if($this->urlParams['Action'] == 'show' && isset($this->urlParams['ID'])) {
+                
+            } else {
+                $log = self::$logs[0];
+            }
+            
+            $file       = fopen($log['Location'], 'r');
+            $fData      = fread($file, filesize($log['Location']));
 
-				$output->push(new ArrayData(array(
-					'File'		=> $log['File'],
-					'Link'		=> $log['Link'],
-					'LogData'	=> $log['LogData']
-				)));
-			}
+            // Cast the log
+            $castLog = new Text('Log');
+            $castLog->setValue(nl2br(strip_tags($fData)));
 
-			return $output;
-		}
-	}
-	
-	private function get_log_data($log = "") {
-		$log = explode('::', $log);
-
-		if($log[1] == 'r')
-			$fullLog = Director::baseFolder()."/$log[0]";
-		elseif($log[1] == 'a')
-			$fullLog = $log;
-			
-		$fileName	= explode('/',$log[0]);
-		$fileName	= $fileName[count($fileName) - 1];
-		$file		= fopen($fullLog, 'r');
-		$fData		= fread($file, filesize($fullLog));
-		$fData		= nl2br(strip_tags($fData));
-
-		// Cast the log
-		$castLog = new Text('Log');
-		$castLog->setValue($fData);
-		
-		return array(
-			'File'		=> $fileName,
-			'Link'		=> $log[0],
-			'LogData'	=> $castLog
-		);
-	}
+            return array(
+                'Filename'  => $log['Filename'],
+                'Path'      => $log['Location'],
+                'Data'      => $castLog
+            );
+        } else
+            return false;
+    }
+    
+    /**
+     * Method responsible for opening and processing a log file sent to it
+     * 
+     * @param type $log 
+     */    
+    private function get_log_contents($log = null) {
+        if(isset($log)) {
+            
+        }
+    }
+    
+    /**
+     * Method that deals with extracting the correct path, either based on the
+     * Silverstripe install base path or use an absolute URL.
+     * 
+     * @param type $path
+     * @param type $type
+     * @return type 
+     */
+    private function get_log_path($path = null, $type = null) {
+        if(isset($path) && isset($type)) {
+            if($type == 'r')
+                $fullLog = Director::baseFolder() . "/{$path}";
+            elseif($type == 'a')
+                $fullLog = $path;
+        
+            return $fullLog;
+        } else
+            return false;
+    }
 }
 ?>

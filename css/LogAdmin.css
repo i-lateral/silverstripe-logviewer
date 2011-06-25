@@ -1,21 +1,32 @@
 .Logs {
-	border:1px solid #aaa !important;
-	background: #fff;
-	margin: 10px;
-	padding: 10px;
-	overflow: auto;
+    border:1px solid #aaa !important;
+    background: #fff;
+    margin: 10px;
+    padding: 10px;
+    overflow: auto;
 }
 
 .Logs .Log {
-	line-height: 1.5em;
+    line-height: 1.5em;
+    font-size: 9pt;
 }
 
 .Logs h2 {
-	color: #333 !important;
-	background: #f2f2f2 !important;
-	font-size: 130% !important;
-	margin-bottom: 5px;
-	padding-left: 10px;
-	line-height: 2.5em !important;
-	height: auto !important;
+    color: #333 !important;
+    background: #f2f2f2 !important;
+    font-size: 130% !important;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    line-height: 2.5em !important;
+    height: auto !important;
+}
+
+.Logs .Nav li {
+    font-size: 10pt;
+}
+.Logs .Nav li a {
+    width: 90%;
+    padding: 5px 5%;
+    text-decoration: none;
+    display: block;
 }
