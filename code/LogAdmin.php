@@ -31,7 +31,7 @@ class LogAdmin extends LeftAndMain {
      * @param type $logLoc File path to log
      * @param type $linkType Say if the path is relative 'r' or absolute 'a'
      */
-    public function addLog($logLoc = null,$linkType = 'r') {
+    public function addLog($logLoc = null,$linkType = 'a') {
         if($logLoc)
             array_push(
                 self::$logs,
@@ -106,7 +106,7 @@ class LogAdmin extends LeftAndMain {
      * @param type $type
      * @return type
      */
-    private function get_log_path($path = null, $type = null) {
+    private function get_log_path($path = null, $type = 'a') {
         if(isset($path) && isset($type)) {
             if($type == 'r')
                 $fullLog = Director::baseFolder() . "/{$path}";
