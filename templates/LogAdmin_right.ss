@@ -2,8 +2,8 @@
     <% if Log %>
         <% control Log %>
             <div class="Log">
-                    <h2>$Log.File ($Path)</h2>
-                    $Data.Value
+                <h2>$Filename ($Path)</h2>
+                $Data
             </div>
         <% end_control %>
     <% else %>

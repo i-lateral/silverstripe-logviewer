@@ -9,11 +9,14 @@ class LogAdmin extends LeftAndMain {
     public static $url_segment = 'logs';
     public static $url_rule = '/$Action/$ID/$OtherID';
     public static $menu_title = 'Logs';
-    public static $menu_priority = -1;
+    public static $menu_priority = 0;
     public static $url_priority = 99;
 
     private static $logs = array();
 
+    /**
+     * Load in some custom styling and JS on initial load
+     */
     public function init() {
         parent::init();
 
@@ -35,7 +38,8 @@ class LogAdmin extends LeftAndMain {
                 array(
                     'Location'  => self::get_log_path($logLoc,$linkType),
                     'Filename'  => basename($logLoc),
-                    'Type'      => $linkType
+                    'Type'      => $linkType,
+                    'Slug'      => str_replace('.', '-', basename($logLoc))
                 )
             );
     }
@@ -50,10 +54,7 @@ class LogAdmin extends LeftAndMain {
 
         if(count(self::$logs) > 0) {
             foreach(self::$logs as $log) {
-                $output->push(new ArrayData(array(
-                    'File'  => $log['Filename'],
-                    'Slug'  => str_replace('.', '-', $log['Filename'])
-                )));
+                $output->push(new ArrayData($log));
             }
 
             return $output;
@@ -68,8 +69,13 @@ class LogAdmin extends LeftAndMain {
      */
     public function getLog() {
         if(is_array(self::$logs) && count(self::$logs) > 0) {
+            $output = new DataObjectSet();
+            
             if($this->urlParams['Action'] == 'show' && isset($this->urlParams['ID'])) {
-                
+                foreach(self::$logs as $item) {
+                    if($item['Slug'] == $this->urlParams['ID'])
+                        $log = $item;
+                }
             } else {
                 $log = self::$logs[0];
             }
@@ -81,24 +87,15 @@ class LogAdmin extends LeftAndMain {
             $castLog = new Text('Log');
             $castLog->setValue(nl2br(strip_tags($fData)));
 
-            return array(
+            $output->push(new ArrayData(array(
                 'Filename'  => $log['Filename'],
                 'Path'      => $log['Location'],
                 'Data'      => $castLog
-            );
+            )));
+            
+            return $output;
         } else
             return false;
-    }
-    
-    /**
-     * Method responsible for opening and processing a log file sent to it
-     * 
-     * @param type $log 
-     */    
-    private function get_log_contents($log = null) {
-        if(isset($log)) {
-            
-        }
     }
     
     /**
@@ -107,7 +104,7 @@ class LogAdmin extends LeftAndMain {
      * 
      * @param type $path
      * @param type $type
-     * @return type 
+     * @return type
      */
     private function get_log_path($path = null, $type = null) {
         if(isset($path) && isset($type)) {
