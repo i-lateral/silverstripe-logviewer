@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Dev\Debug;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBText;
 use SilverStripe\View\Requirements;
 use SilverStripe\View\ArrayData;
 use SilverStripe\Control\Director;
@@ -11,11 +14,9 @@ use SilverStripe\Admin\LeftAndMain;
  */
 class LogAdmin extends LeftAndMain
 {
-    public static $url_segment = 'logs';
-    public static $url_rule = '/$Action/$ID/$OtherID';
-    public static $menu_title = 'Logs';
-    public static $menu_priority = 0;
-    public static $url_priority = 99;
+    private static $url_segment = 'logs';
+    private static $url_rule = '/$Action/$ID/$OtherID';
+    private static $menu_title = 'Logs';
 
     private static $logs = array();
 
@@ -33,11 +34,11 @@ class LogAdmin extends LeftAndMain
     /**
      * Use addLog to add log files that will be rendered in the CMS. You can add
      * new logs by calling LogAdmin::addLog($logFile,$linkType) in your _config.
-     * 
+     *
      * @param type $logLoc   File path to log
      * @param type $linkType Say if the path is relative 'r' or absolute 'a'
      */
-    public function addLog($logLoc = null, $linkType = 'a')
+    public static function addLog($logLoc = null, $linkType = 'a')
     {
         if ($logLoc) {
             array_push(
@@ -54,12 +55,12 @@ class LogAdmin extends LeftAndMain
 
     /**
      * Return a list of all logs that will be used for navigation.
-     * 
-     * @return DataObjectSet
+     *
+     * @return ArrayList
      */
     public function getLogList()
     {
-        $output = new DataObjectSet();
+        $output = new ArrayList();
 
         if (count(self::$logs) > 0) {
             foreach (self::$logs as $log) {
@@ -73,13 +74,13 @@ class LogAdmin extends LeftAndMain
     /**
      * Get detail of a specific log, open and process it, then return
      * to template.
-     * 
+     *
      * @return ArrayData
      */
     public function getLog()
     {
         if (is_array(self::$logs) && count(self::$logs) > 0) {
-            $output = new DataObjectSet();
+            $output = new ArrayList();
 
             if ($this->urlParams['Action'] == 'show' && isset($this->urlParams['ID'])) {
                 foreach (self::$logs as $item) {
@@ -95,9 +96,11 @@ class LogAdmin extends LeftAndMain
             $fData = fread($file, filesize($log['Location']));
 
             // Cast the log
-            $castLog = new Text('Log');
+            $castLog = new DBText('Log');
             $castLog->setValue(nl2br(strip_tags($fData)));
 
+            //Debug::dump($fData);
+            //die;
             $output->push(new ArrayData(array(
                 'Filename' => $log['Filename'],
                 'Path' => $log['Location'],
@@ -113,13 +116,13 @@ class LogAdmin extends LeftAndMain
     /**
      * Method that deals with extracting the correct path, either based on the
      * Silverstripe install base path or use an absolute URL.
-     * 
+     *
      * @param type $path
      * @param type $type
      *
      * @return type
      */
-    private function get_log_path($path = null, $type = 'a')
+    private static function get_log_path($path = null, $type = 'a')
     {
         if (isset($path) && isset($type)) {
             if ($type == 'r') {
