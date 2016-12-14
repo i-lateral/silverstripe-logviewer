@@ -1,0 +1,18 @@
+{
+  "name": "anselmdk/silverstripe-logviewer",
+  "description": "Easily access recent server logs through your Silverstripe CMS",
+  "type": "silverstripe-module",
+  "homepage": "https://github.com/anselmdk/silverstripe-logviewer",
+  "keywords": ["silverstripe", "log", "viewer"],
+  "license": "BSD",
+  "authors": [
+    {"name": "Anselm Christophersen","email": "ac@anselm.dk"},
+    {"name": "Morven Lewis-Everley","email": "morven@i-lateral.com"}
+  ],
+  "require": {
+    "silverstripe/framework": "^4"
+  },
+  "extra": {
+    "installer-name": "logviewer"
+  }
+}

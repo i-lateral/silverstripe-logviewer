@@ -9,6 +9,7 @@
 .Logs .Log {
     line-height: 1.5em;
     font-size: 9pt;
+    white-space: pre;
 }
 
 .Logs h2 {
